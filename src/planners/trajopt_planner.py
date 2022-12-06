@@ -258,7 +258,7 @@ class TrajoptPlanner(object):
 				prob.AddCost(self.efficiency_cost, [(t-1, j) for j in range(7)]+[(t, j) for j in range(7)], "efficiency%i"%t)
 			if 'learned_feature' in self.environment.feature_list:
 				prob.AddErrorCost(self.learned_feature_costs, self.learned_feature_cost_derivatives, [(t-1, j) for j in range(7)]+[(t, j) for j in range(7)], "ABS", "learned_features%i"%t)
-				# [(t-1, j) for j in range(7)]+
+
 		for t in range(1, self.num_waypts - 1):
 			prob.AddConstraint(self.environment.table_constraint, [(t, j) for j in range(7)], "INEQ", "up%i"%t)
 

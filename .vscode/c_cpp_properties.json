@@ -1,0 +1,41 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/janne/ros_ws/ferl/devel/include/**",
+        "/home/janne/phd1/xarm/devel/include/**",
+        "/home/janne/phd1/shared_control/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/janne/phd1/shared_control/src/shared_control/arm_pomdp/include/**",
+        "/home/janne/phd1/xarm/src/xarm/gazebo_xarm_interface/include/**",
+        "/home/janne/phd1/shared_control/src/joystick/moveit_servo/include/**",
+        "/home/janne/phd1/shared_control/src/joystick/razer_hydra/include/**",
+        "/home/janne/phd1/xarm/src/xarm/xarm_ros/realsense_gazebo_plugin/include/**",
+        "/home/janne/phd1/xarm/src/xarm/roboticsgroup_upatras_gazebo_plugins/include/**",
+        "/home/janne/ros_ws/ferl/src/tesseract/tesseract_collision/include/**",
+        "/home/janne/ros_ws/ferl/src/tesseract/tesseract_core/include/**",
+        "/home/janne/ros_ws/ferl/src/tesseract/tesseract_planning/include/**",
+        "/home/janne/ros_ws/ferl/src/tesseract/tesseract_ros/include/**",
+        "/home/janne/ros_ws/ferl/src/tesseract/tesseract_rviz/include/**",
+        "/home/janne/ros_ws/ferl/src/trajopt/trajopt/include/**",
+        "/home/janne/ros_ws/ferl/src/trajopt/trajopt_ros/include/**",
+        "/home/janne/ros_ws/ferl/src/trajopt/trajopt_sco/include/**",
+        "/home/janne/ros_ws/ferl/src/trajopt/trajopt_utils/include/**",
+        "/home/janne/phd1/xarm/src/xarm/xarm_ros/xarm_api/include/**",
+        "/home/janne/phd1/xarm/src/xarm/xarm_ros/xarm_controller/include/**",
+        "/home/janne/phd1/shared_control/src/shared_control/xarm_pybullet/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

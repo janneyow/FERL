@@ -16,6 +16,7 @@ class Environment(object):
 	def __init__(self, model_filename, object_centers, feat_list, feat_range, feat_weights, LF_dict=None, viewer=True):
 		# ---- Create environment ---- #
 		self.env, self.robot = initialize(model_filename, viewer=viewer)
+		# creates environment in openrave
 
 		# Insert any objects you want into environment.
 		self.bodies = []
@@ -59,7 +60,7 @@ class Environment(object):
 		self.weights = feat_weights
 
         # Initialize LF_dict optionally for learned features.
-        self.LF_dict = LF_dict
+		self.LF_dict = LF_dict
 
 	# -- Compute features for all waypoints in trajectory. -- #
 	def featurize(self, waypts, feat_idx=None):

@@ -3,7 +3,7 @@
 Control, planning, and learning system for human-robot interaction with a JACO2 7DOF robotic arm. Supports learning rewards from physical corrections, as well as learning new reward features.
 
 ## Dependencies
-* Ubuntu 14.04, ROS Indigo, OpenRAVE, Python 2.7
+* Ubuntu 20.04, ROS Noetic, Python 3, PyBullet/MujocoPy
 * or_trajopt, or_urdf, or_rviz, prpy, pr_ordata
 * kinova-ros
 * fcl
@@ -54,7 +54,7 @@ contact the authors.
 ### Starting the Docker Container
 We also provide a docker image with Ubuntu, ROS, and all necessary packages installed. Just clone the FERL repo and then run the following docker command to download and run the docker image.
 
-`docker run -it -p 8888:8888 -v <full path to cloned FERL repo>:/root/catkin_ws/src/FERL mariuswi/trajopt_ws:1.0`
+`sudo docker run -it -p 8888:8888 -v ~/ros_ws/ferl/src/FERL mariuswi/trajopt_ws:1.0`
 
 This will bring you to the command line of the docker container with port forwarding to 8888 activated (e.g. for running the example notebooks).
 

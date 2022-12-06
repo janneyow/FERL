@@ -64,8 +64,8 @@ def start_admittance_mode(prefix):
 	try:
 		startForceControl = rospy.ServiceProxy(service_address, Start)
 		startForceControl()
-	except rospy.ServiceException, e:
-		print "Service call failed: %s"%e
+	except rospy.ServiceException as e:
+		print("Service call failed: %s"%e)
 		return None
 
 def stop_admittance_mode(prefix):
@@ -77,7 +77,7 @@ def stop_admittance_mode(prefix):
     try:
         stopForceControl = rospy.ServiceProxy(service_address, Stop)
         stopForceControl()
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+    except rospy.ServiceException as e:
+        print("Service call failed: %s"%e)
         return None
 

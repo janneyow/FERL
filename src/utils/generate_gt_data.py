@@ -7,16 +7,16 @@ import torch
 import os, sys
 
 def sample_data(environment, feature, n_samples=10000):
-    """
-    Generates feature data with the ground truth feature function.
-    Params:
-        environment -- environment where the feature lives
-        feature -- string representing the feature to sample
-        n_samples -- number of samples (default: 10000)
-    Returns:
-        train_points -- configuration space waypoint samples
-        regression_labels -- feature labels for train_points
-    """
+	"""
+	Generates feature data with the ground truth feature function.
+	Params:
+		environment -- environment where the feature lives
+		feature -- string representing the feature to sample
+		n_samples -- number of samples (default: 10000)
+	Returns:
+		train_points -- configuration space waypoint samples
+		regression_labels -- feature labels for train_points
+	"""
 	n_per_dim = math.ceil(n_samples ** (1 / 7))
 	#  we are in 7D radian space
 	dim_vector = np.linspace(0, 2 * np.pi, n_per_dim)
@@ -45,17 +45,16 @@ def sample_data(environment, feature, n_samples=10000):
 	return np.array(train_points), regression_labels
 
 # -- Distance to Table -- #
-
 def table_features(environment, waypt):
-    """
-    Computes the total feature value over waypoints based on z-axis distance to table.
-    ---
-    Params:
-        environment -- environment where the feature lives
-        waypt -- single waypoint
-    Returns:
-        dist -- scalar feature
-    """
+	"""
+	Computes the total feature value over waypoints based on z-axis distance to table.
+	---
+	Params:
+		environment -- environment where the feature lives
+		waypt -- single waypoint
+	Returns:
+		dist -- scalar feature
+	"""
 	if len(waypt) < 10:
 		waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 		waypt[2] += math.pi
@@ -68,16 +67,16 @@ def table_features(environment, waypt):
 # -- Coffee (or z-orientation of end-effector) -- #
 
 def coffee_features(environment, waypt):
-    """
-    Computes the coffee orientation feature value for waypoint
-    by checking if the EE is oriented vertically.
-    ---
-    Params:
-        environment -- environment where the feature lives
-        waypt -- single waypoint
-    Returns:
-        dist -- scalar feature
-    """
+	"""
+	Computes the coffee orientation feature value for waypoint
+	by checking if the EE is oriented vertically.
+	---
+	Params:
+		environment -- environment where the feature lives
+		waypt -- single waypoint
+	Returns:
+		dist -- scalar feature
+	"""
 	if len(waypt) < 10:
 		waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 		waypt[2] += math.pi
@@ -90,16 +89,16 @@ def coffee_features(environment, waypt):
 # -- Distance to Laptop -- #
 
 def laptop_features(environment, waypt):
-    """
-    Computes distance from end-effector to laptop in xy coords
-    Params:
-        environment -- environment where the feature lives
-        waypt -- single waypoint
-    Returns:
-        dist -- scalar distance where
-            0: EE is at more than 0.3 meters away from laptop
-            +: EE is closer than 0.3 meters to laptop
-    """
+	"""
+	Computes distance from end-effector to laptop in xy coords
+	Params:
+		environment -- environment where the feature lives
+		waypt -- single waypoint
+	Returns:
+		dist -- scalar distance where
+			0: EE is at more than 0.3 meters away from laptop
+			+: EE is closer than 0.3 meters to laptop
+	"""
 	if len(waypt) < 10:
 		waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 		waypt[2] += math.pi
@@ -116,16 +115,16 @@ def laptop_features(environment, waypt):
 # -- Distance to Human -- #
 
 def human_features(environment, waypt):
-    """
-    Computes distance from end-effector to human in xy coords
-    Params:
-        environment -- environment where the feature lives
-        waypt -- single waypoint
-    Returns:
-        dist -- scalar distance where
-            0: EE is at more than 0.4 meters away from human
-            +: EE is closer than 0.4 meters to human
-    """
+	"""
+	Computes distance from end-effector to human in xy coords
+	Params:
+		environment -- environment where the feature lives
+		waypt -- single waypoint
+	Returns:
+		dist -- scalar distance where
+			0: EE is at more than 0.4 meters away from human
+			+: EE is closer than 0.4 meters to human
+	"""
 	if len(waypt) < 10:
 		waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 		waypt[2] += math.pi
@@ -141,16 +140,16 @@ def human_features(environment, waypt):
 # -- Proxemics -- #
 
 def proxemics_features(environment, waypt):
-    """
-    Computes distance from end-effector to human proxemics in xy coords
-    Params:
-        environment -- environment where the feature lives
-        waypt -- single waypoint
-    Returns:
-        dist -- scalar distance where
-            0: EE is at more than 0.3 meters away from human
-            +: EE is closer than 0.3 meters to human
-    """
+	"""
+	Computes distance from end-effector to human proxemics in xy coords
+	Params:
+		environment -- environment where the feature lives
+		waypt -- single waypoint
+	Returns:
+		dist -- scalar distance where
+			0: EE is at more than 0.3 meters away from human
+			+: EE is closer than 0.3 meters to human
+	"""
 	if len(waypt) < 10:
 		waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 		waypt[2] += math.pi
@@ -167,16 +166,16 @@ def proxemics_features(environment, waypt):
 	return -dist
 
 def betweenobjects_features(environment, waypt):
-    """
-    Computes distance from end-effector to 2 objects in xy coords.
-    Params:
-        environment -- environment where the feature lives
-        waypt -- single waypoint
-    Returns:
-        dist -- scalar distance where
-            0: EE is at more than 0.2 meters away from the objects and between
-            +: EE is closer than 0.2 meters to the objects and between
-    """
+	"""
+	Computes distance from end-effector to 2 objects in xy coords.
+	Params:
+		environment -- environment where the feature lives
+		waypt -- single waypoint
+	Returns:
+		dist -- scalar distance where
+			0: EE is at more than 0.2 meters away from the objects and between
+			+: EE is closer than 0.2 meters to the objects and between
+	"""
 	if len(waypt) < 10:
 		waypt = np.append(waypt.reshape(7), np.array([0,0,0]))
 		waypt[2] += math.pi
@@ -209,16 +208,16 @@ def betweenobjects_features(environment, waypt):
 
 def generate_gt_data(feature):
 	# create environment instance
-	print "Creating environment"
-    if feature == "between_objects":
-        objects = {'OBJECT1': [-0.6,-0.2,0.0], 'OBJECT2': [-0.2,0.0,0.0]}
-    else:
-        objects = {'HUMAN_CENTER': [-0.2,-0.5,0.6], 'LAPTOP_CENTER': [-0.8, 0.0, 0.0]}
+	print("Creating environment")
+	if feature == "between_objects":
+		objects = {'OBJECT1': [-0.6,-0.2,0.0], 'OBJECT2': [-0.2,0.0,0.0]}
+	else:
+		objects = {'HUMAN_CENTER': [-0.2,-0.5,0.6], 'LAPTOP_CENTER': [-0.8, 0.0, 0.0]}
 	environment = Environment("jaco_dynamics", objects, [feature], [1.0], np.array([0.0]), viewer=False)
-	print "Finished environment"
+	print("Finished environment")
 	# create Learned_Feature
 	environment.new_learned_feature(nb_layers, nb_units)
-	print "Generating data..."
+	print("Generating data...")
 	# generate training data
 	if feature == "laptopmoving":
 		positions = {"L1": [-0.8, 0.0, 0.0], "L2": [-0.6, 0.0, 0.0], "L3": [-0.4, 0.0, 0.0], "L4": [-0.8, 0.2, 0.0],
@@ -246,7 +245,7 @@ def generate_gt_data(feature):
 			train_raw = np.vstack((train_raw, environment.raw_features(dp)))
 		here = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../../'))
 		np.savez(here+'/data/gtdata/data_{}.npz'.format(feature), x=train_raw, y=labels)
-	print "Finished generating data."
+	print("Finished generating data.")
 
 if __name__ == '__main__':
 	feat = sys.argv[1]

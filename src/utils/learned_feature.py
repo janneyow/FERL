@@ -315,6 +315,7 @@ class LearnedFeature(object):
 	def train(self, epochs=100, batch_size=32, learning_rate=1e-3, weight_decay=0.001, s_g_weight=10.):
 		"""
 			Train the Feature function with the current data. Settings self-explanatory.
+			Section 2.2 - Learning a feature function
 			----
 			Input:
 			epochs, batch_size, learning_rate, weight_decay, s_g_weight

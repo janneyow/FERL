@@ -127,7 +127,7 @@ class Trajectory(object):
 		deform_waypt_idx = int((t - self.waypts_time[0]) / self.timestep) + 1
 
 		if (deform_waypt_idx + n) > self.num_waypts:
-			print "Deforming too close to end. Returning same trajectory"
+			print("Deforming too close to end. Returning same trajectory")
 			return Trajectory(waypts_deform, self.waypts_time)
 
 		for joint in range(7):

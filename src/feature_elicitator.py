@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
 This node demonstrates velocity-based PID control by moving the Jaco so that it
 maintains a fixed distance to a target. Additionally, it supports human-robot
@@ -20,7 +20,7 @@ from kinova_msgs.srv import *
 from controllers.pid_controller import PIDController
 from planners.trajopt_planner import TrajoptPlanner
 from learners.phri_learner import PHRILearner
-from utils import ros_utils, openrave_utils
+from utils import ros_utils
 from utils.environment import Environment
 from utils.trajectory import Trajectory
 
@@ -54,20 +54,20 @@ class FeatureElicitator():
 		# Publish to ROS at 100hz.
 		r = rospy.Rate(100)
 
-		print "----------------------------------"
-		print "Moving robot, type Q to quit:"
+		print("----------------------------------")
+		print("Moving robot, type Q to quit:")
 
 		while not rospy.is_shutdown():
 
 			if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-				line = raw_input()
+				line = input()
 				if line == "q" or line == "Q" or line == "quit":
 					break
 
 			self.vel_pub.publish(ros_utils.cmd_to_JointVelocityMsg(self.cmd))
 			r.sleep()
 
-		print "----------------------------------"
+		print("----------------------------------")
 		ros_utils.stop_admittance_mode(self.prefix)
 
 	def load_parameters(self):
@@ -98,8 +98,9 @@ class FeatureElicitator():
 		weights = rospy.get_param("setup/feat_weights")
 		FEAT_RANGE = rospy.get_param("setup/FEAT_RANGE")
 		feat_range = [FEAT_RANGE[feat_list[feat]] for feat in range(len(feat_list))]
-        LF_dict = rospy.get_param("setup/LF_dict")
-		self.environment = Environment(model_filename, object_centers, feat_list, feat_range, np.array(weights), LF_dict)
+		lf_dict = rospy.get_param("setup/LF_dict")
+        # LF_dict = rospy.get_param("setup/LF_dict")
+		self.environment = Environment(model_filename, object_centers, feat_list, feat_range, np.array(weights), lf_dict)
 
 		# ----- Planner Setup ----- #
 		# Retrieve the planner specific parameters.
@@ -216,9 +217,13 @@ class FeatureElicitator():
 		"""
 		Reads the latest torque sensed by the robot and records it for
 		plotting & analysis
+
+		Algorithm 1: (FERL) in paper
 		"""
 		# Read the current joint torques from the robot.
 		torque_curr = np.array([msg.joint1,msg.joint2,msg.joint3,msg.joint4,msg.joint5,msg.joint6,msg.joint7]).reshape((7,1))
+		
+		# Need to change interaction if we want to do it in simulation?
 		interaction = False
 		for i in range(7):
 			# Center torques around zero.
@@ -236,29 +241,32 @@ class FeatureElicitator():
 					self.interaction_mode = True
 		else:
 			if self.interaction_mode == True:
+				# Section 2.4 - Confidence estimation
 				# Check if betas are above CONFIDENCE_THRESHOLD
 				betas = self.learner.learn_betas(self.traj, self.interaction_data[0], self.interaction_time[0])
+				
 				if max(betas) < self.CONFIDENCE_THRESHOLD:
 					# We must learn a new feature that passes CONFIDENCE_THRESHOLD before resuming.
-					print "The robot does not understand the input!"
+					print("The robot does not understand the input!")
 					self.feature_learning_mode = True
 					feature_learning_timestamp = time.time()
 					input_size = len(self.environment.raw_features(torque_curr))
 					self.environment.new_learned_feature(self.nb_layers, self.nb_units)
 					while True:
+						# Query feature trace (section 2.1)
 						# Keep asking for input until we're happy.
 						for i in range(self.N_QUERIES):
-							print "Need more data to learn the feature!"
+							print("Need more data to learn the feature!")
 							self.feature_data = []
 
 							# Request the person to place the robot in a low feature value state.
-							print "Place the robot in a low feature value state and press ENTER when ready."
-							line = raw_input()
+							print("Place the robot in a low feature value state and press ENTER when ready.")
+							line = input()
 							self.track_data = True
 
 							# Request the person to move the robot to a high feature value state.
-							print "Move the robot in a high feature value state and press ENTER when ready."
-							line = raw_input()
+							print("Move the robot in a high feature value state and press ENTER when ready.")
+							line = input()
 							self.track_data = False
 
 							# Pre-process the recorded data before training.
@@ -270,32 +278,34 @@ class FeatureElicitator():
 							while np.linalg.norm(feature_data[hi] - feature_data[hi - 1]) < 0.01 and hi > 0:
 								hi -= 1
 							feature_data = feature_data[lo:hi+1, :]
-							print "Collected {} samples out of {}.".format(feature_data.shape[0], len(self.feature_data))
+							print("Collected {} samples out of {}.".format(feature_data.shape[0], len(self.feature_data)))
 
 							# Provide optional start and end labels.
 							start_label = 0.0
 							end_label = 1.0
 							print("Would you like to label your start? Press ENTER if not or enter a number from 0-10")
-							line = raw_input()
+							line = input()
 							if line in [str(i) for i in range(11)]:
 								start_label = int(i) / 10.0
 
 							print("Would you like to label your goal? Press ENTER if not or enter a number from 0-10")
-							line = raw_input()
+							line = input()
 							if line in [str(i) for i in range(11)]:
 								end_label = float(i) / 10.0
 
 							# Add the newly collected data.
 							self.environment.learned_features[-1].add_data(feature_data, start_label, end_label)
+						
+						# Learn feature (Section 2.2)
 						# Train new feature with data of increasing "goodness".
 						self.environment.learned_features[-1].train()
 
 						# Check if we're happy with the input.
-						print "Are you happy with the training? (yes/no)"
-						line = raw_input()
+						print("Are you happy with the training? (yes/no)")
+						line = input()
 						if line == "yes" or line == "Y" or line == "y":
 							break
-
+					
 					# Compute new beta for the new feature.
 					beta_new = self.learner.learn_betas(self.traj, torque_curr, timestamp, [self.environment.num_features - 1])[0]
 					betas.append(beta_new)
@@ -306,9 +316,12 @@ class FeatureElicitator():
 				# We do not have misspecification now, so resume reward learning.
 				self.feature_learning_mode = False
 
+				# Update reward - Section 2.3: only update weight index corresponding to feature that changes the most
+				# learn_weights outputs the maximum of the weights
 				# Learn reward.
 				for i in range(len(self.interaction_data)):
 					self.learner.learn_weights(self.traj, self.interaction_data[i], self.interaction_time[i], betas)
+				# Replan trajectory
 				self.traj = self.planner.replan(self.start, self.goal, self.goal_pose, self.T, self.timestep, seed=self.traj_plan.waypts)
 				self.traj_plan = self.traj.downsample(self.planner.num_waypts)
 				self.controller.set_trajectory(self.traj)

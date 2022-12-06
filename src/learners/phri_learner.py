@@ -25,6 +25,8 @@ class PHRILearner(object):
 		"""
 		To estimate beta, we need to set up the optimization problem, compute
 		optimal u_H wrt every feature, and calculate beta value per feature.
+
+		Section 2.4 - Estimate confidence of human interaction
 		---
 
 		Params:
@@ -82,18 +84,19 @@ class PHRILearner(object):
 			waypts_deform_p = traj.deform(u_h_star, t, self.alpha, self.n).waypts
 			H_features = self.environment.featurize(waypts_deform_p)
 			Phi_u_star = np.array([sum(x) for x in H_features])
-			print "Phi_p: ", Phi_p[i]
-			print "Phi_p_H: ", Phi_u_star
-
-			print "u_h: ", u_h, np.linalg.norm(u_h)
-			print "u_h_star: ", u_h_star, np.linalg.norm(u_h_star)
+			print("Phi_p: ", Phi_p[i])
+			print("Phi_p_H: ", Phi_u_star
+)
+			print("u_h: ", u_h, np.linalg.norm(u_h))
+			print("u_h_star: ", u_h_star, np.linalg.norm(u_h_star))
 
 			# Compute beta based on deviation from optimal action.
+			# beta directly proportional to [ 1 / (||aH||^2 - ||aH*||^2) ]		(taken from Journal paper, eqn 19)
 			beta_norm = 1.0 / np.linalg.norm(u_h_star) ** 2
 			beta = self.environment.num_features / (2 * beta_norm * abs(np.linalg.norm(u_h)**2 - np.linalg.norm(u_h_star)**2))
 			betas.append(beta)
 
-		print "Here is beta:", betas
+		print("Here is beta:", betas)
 		return betas
 
 	def learn_weights(self, traj, u_h, t, betas):
@@ -101,6 +104,8 @@ class PHRILearner(object):
 		Deforms the trajectory given human force, u_h, and
 		updates features by computing difference between
 		features of new trajectory and old trajectory.
+
+		Section 2.3 - Online reward update
 		---
 
 		Params:
@@ -128,19 +133,19 @@ class PHRILearner(object):
 		else:
 			raise Exception('Learning method {} not implemented.'.format(self.feat_method))
 
-		print "Here is the update:", update
-		print "Here are the old weights:", self.environment.weights
-		print "Here are the new weights:", curr_weight
+		print("Here is the update:", update)
+		print("Here are the old weights:", self.environment.weights)
+		print("Here are the new weights:", curr_weight)
 		self.environment.weights = np.maximum(curr_weight, np.zeros(curr_weight.shape))
 
 	def all_update(self, update):
-        """
+		"""
         Update based on all feature values.
         """
 		return self.environment.weights - self.step_size * update
 
 	def max_update(self, update):
-        """
+		"""
         Update based only on the maximal feature difference.
         """
 		# Get index of maximal change.
@@ -155,6 +160,8 @@ class PHRILearner(object):
 		"""
 		To estimate theta, we need to retrieve the appropriate P(E | beta),
 		then optimize the gradient step with Newton Rapson.
+
+		Section 2.3 - Online reward update
 		---
 
 		Params:
@@ -164,6 +171,7 @@ class PHRILearner(object):
 			weights -- a vector of the new weights
 		"""
 		confidence = [1.0] * self.environment.num_features
+		# Correct feature one at a time
 		for i in range(self.environment.num_features):
 			### Compute update using P(r|beta) for the beta estimate we just computed ###
 			# Compute P(r|beta)
@@ -189,7 +197,7 @@ class PHRILearner(object):
 			denom = p_r0 * (l/math.pi) ** (self.environment.num_features/2.0) * np.exp(-l*update[i]**2) + num
 			confidence[i] = num/denom
 
-		print "Here is weighted beta:", confidence
+		print("Here is weighted beta:", confidence)
 		weights = self.environment.weights - np.array(confidence) * self.step_size * update
 		return weights
 
